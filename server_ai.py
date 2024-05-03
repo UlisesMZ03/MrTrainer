@@ -5,7 +5,7 @@ import unicodedata
 openai.api_key = "sk-proj-WuoXT5lUp3mNnsckReEnT3BlbkFJx8sphbgdtHgKpH1C85a2"
 
 def remove_accents(input_str_):
-    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    nfkd_form = unicodedata.normalize('NFKD', input_str_)
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 s = socket.socket()
@@ -19,13 +19,12 @@ chat_history = []
 try:
     while True:
         c, addr = s.accept()
-        print('Connected with', addr)
         
         data = c.recv(1024)  # Receive data from client
-        print("Received:", data)
+
         prompt = data.decode('utf-8')  # Decode bytes to string with UTF-8
         prompt = remove_accents(prompt)  # Remove accents from the prompt
-        print("Received:", prompt)
+
 
         if prompt == "exit":
             break
@@ -46,14 +45,11 @@ try:
             collected_messages.append(chunk_message)  # Save the message
             full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
 
-        print(full_reply_content)
         # Apply remove_accents function before sending response
         full_reply_content = remove_accents(full_reply_content)
         # Send response back to the client after the completion of the response
         c.sendall(full_reply_content.encode('utf-8'))  # Encode string to bytes with UTF-8
 
-        # Clear the terminal
-        print("\033[H\033[J", end="")
 
         chat_history.append({"role": "assistant", "content": full_reply_content})
         c.close()

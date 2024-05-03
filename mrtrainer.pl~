@@ -1,34 +1,12 @@
 :- use_module(library(socket)).
 :- use_module(library(streampool)).
 
-% Predicado principal que inicia la conversación.
-%
-% Recibe:
-% - Nada.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Lee la entrada del usuario, la convierte a minúsculas y la divide en palabras.
 comenzar:-
     read_string(user_input, '\n', '.',_,Q),
     string_lower(Q,Minuscula),
     atomic_list_concat(List,' ',Minuscula),
     iniciarConversacionAux(List,[]).
 
-% Predicado para iniciar la conversación, considerando diferentes casos de entrada del usuario.
-%
-% Recibe:
-% - Lista de palabras de la entrada del usuario.
-% - Lista vacía.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Verifica si el usuario saluda al entrenador o pregunta por la hora.
-% Llama a los predicados correspondientes según la entrada del usuario.
 iniciarConversacion(List,Vacio):-
     saludo(List,Resto),
     entrenador(Resto,Vacio).
@@ -40,42 +18,20 @@ iniciarConversacion(List,Vacio):-
 iniciarConversacion(List,Vacio):-
     saludo(List,Vacio).
 
-% Predicado auxiliar para iniciar la conversación y solicitar una rutina personalizada.
-%
-% Recibe:
-% - Lista de palabras de la entrada del usuario.
-% - Lista vacía.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Llama a los predicados para obtener las preferencias del usuario (deporte, nivel y enfermedad).
-% Envía una solicitud al servidor para crear una rutina personalizada.
 iniciarConversacionAux(List,[]):-
     iniciarConversacion(List,[]),
     deporteUsuario(Deporte),
     nivelUsuario(Nivel),
-    enfermedadUsuario(Enfermedad),
-    write("\n\n -> Esta es la rutina completamente personalizada segun tus elecciones: <-\n\n "),
-    create_client('localhost',9999,("creame una rutina personalizada para cada dia de la semana tomando en cuenta lo siguiente:","Deporte que quiero practicar: ",Deporte,"Padecimiento que tengo: ",Enfermedad,"Nivel del entrenamiento: ",Nivel,"tomando en cuenta que principiante son solo 2 dias a la semana, intermedio son solo 4 dias dias a la semana y avanzado son solo 6 dias a la semana "),Response),
-    break.
+        enfermedadUsuario(Enfermedad),
+        write("\n\n -> Esta es la rutina completamente personalizada segun tus elecciones: <-\n\n "),
+
+     create_client('localhost',9999,("creame una rutina personalizada para cada dia de la semana tomando en cuenta lo siguiente:","Deporte que quiero practicar: ",Deporte,"Padecimiento que tengo: ",Enfermedad,"Nivel del entrenamiento: ",Nivel,"tomando en cuenta que principiante son solo 2 dias a la semana, intermedio son solo 4 dias dias a la semana y avanzado son solo 6 dias a la semana "),Response),
+     break.
 
 iniciarConversacionAux(List,[]):-
     write("¿Me estás saludando? Porque no te entendí.\n"),
     comenzar.
 
-% Predicado para obtener el deporte preferido del usuario.
-%
-% Recibe:
-% - Nada.
-%
-% Retorna:
-% - Deporte seleccionado por el usuario.
-%
-% Función:
-% Pregunta al usuario si quiere empezar a entrenar y qué deporte prefiere.
-% Llama al predicado obtenerDeporte para procesar la respuesta.
 deporteUsuario(Deporte):-
     write("¡Hola! ¿Cómo estás?\n ¿Te gustaría empezar a entrenar? (si/no)"), nl,
     read_string(user_input, '\n', '.', _, Q),
@@ -87,21 +43,10 @@ deporteUsuario(Deporte):-
     write("No te entendí. Prueba las siguientes respuestas: \n Si / Si correr \n"),
     deporteUsuario(Deporte).
 
-% Predicado para obtener el deporte preferido del usuario.
-%
-% Recibe:
-% - Lista de palabras de la entrada del usuario.
-% - Lista vacía.
-% - Deporte seleccionado por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Verifica si el usuario ha respondido afirmativamente y procesa la elección del deporte.
+
 obtenerDeporte(List, Vacio, Deporte):-
     si(List, Vacio),
-    listarDeportes(Deporte).
+     listarDeportes(Deporte).
 
 obtenerDeporte(List,Vacio,Deporte):-
     no(List,Vacio),
@@ -113,16 +58,6 @@ obtenerDeporte(List,Vacio,Deporte):-
     deporte(Resto,Vacio),
     atomics_to_string(Resto,Deporte).
 
-% Predicado para listar los deportes disponibles.
-%
-% Recibe:
-% - Deporte seleccionado por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Lista los deportes disponibles para que el usuario elija uno.
 listarDeportes(DeporteSeleccionado):-
     write("Tenemos las siguientes categorías: (Escribelo tal cual aparece en la lista)\n"),
     deporte([Deporte|_], _), % Obtener solo el primer elemento de la lista
@@ -138,17 +73,13 @@ listarDeportes(Deporte):-
     deporte(Deporte,_),
     !.
 
-% Predicado para obtener la enfermedad del usuario.
-%
-% Recibe:
-% - Enfermedad seleccionada por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Pregunta al usuario si tiene alguna enfermedad que afecte su entrenamiento.
-% Llama al predicado obtenerEnfermedad para procesar la respuesta.
+
+
+
+
+
+
+
 enfermedadUsuario(Enfermedad):-
     write("¿Has tenido alguna patología que te impida hacer ejercicio con normalidad? \n"), nl,
     read_string(user_input, '\n', '.', _, Q),
@@ -160,25 +91,15 @@ enfermedadUsuario(Enfermedad):-
     write("No entendí tu respuesta. "),
     enfermedadUsuario(Enfermedad).
 
-% Predicado para obtener la enfermedad del usuario.
-%
-% Recibe:
-% - Lista de palabras de la entrada del usuario.
-% - Lista vacía.
-% - Enfermedad seleccionada por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Verifica si el usuario ha respondido afirmativamente y procesa la elección de la enfermedad.
+
+
 obtenerEnfermedad(List, Vacio, Enfermedad):-
     si(List, Vacio),
-    listarEnfermedades(Enfermedad).
+     listarEnfermedades(Enfermedad).
 
 obtenerEnfermedad(List,Vacio,Enfermedad):-
     enfermedad(List,Vacio),
-    atomics_to_string(List,Enfermedad).
+     atomics_to_string(List,Enfermedad).
 
 
 obtenerEnfermedad(List,Vacio,Enfermedad):-
@@ -186,16 +107,6 @@ obtenerEnfermedad(List,Vacio,Enfermedad):-
     enfermedad(Resto,Vacio),
     atomics_to_string(Resto,enfermedad).
 
-% Predicado para listar las enfermedades disponibles.
-%
-% Recibe:
-% - Enfermedad seleccionada por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Lista las enfermedades disponibles para que el usuario elija una.
 listarEnfermedades(EnfermedadSeleccionada):-
     write("Tenemos las siguientes enfermedades: (Escribela tal cual aparece en la lista)\n"),
     enfermedad([Enfermedad|_], _), % Obtener solo el primer elemento de la lista
@@ -208,8 +119,9 @@ listarEnfermedades(Enfermedad) :-
     read_string(user_input, '\n', '.', _, Q),
     string_lower(Q, EnfermedadSeleccionada),
     listaEnfermedades(Enfermedades),
-    create_client('localhost', 9999,("Del siguiente texto solo devuelveme lo que consideres que es un padecimiento pero solo el padecimiento, sin verbos ni nada mas ", EnfermedadSeleccionada, "devuelvelo con el nombre obtenido aqui y si no se encuentra entres las opciones entonces elige una de las opciones que mas se aproxime al padecimiento (si o si debes elegir una de las opciones) de las siguientes: ",Enfermedades), Response),
-    write(Response),
+        create_client('localhost', 9999,("Del siguiente texto solo devuelveme lo que consideres que es un padecimiento pero solo el padecimiento, sin verbos ni nada mas ", EnfermedadSeleccionada, "devuelvelo con el nombre obtenido aqui y si no se encuentra entres las opciones entonces elige una de las opciones que mas se aproxime al padecimiento (si o si debes elegir una de las opciones) de las siguientes: ",Enfermedades)
+, Response),
+        write(Response),
     atomic_list_concat(Enfermedad, ' ',Response ),
 
     (   enfermedad(Enfermedad, _) ->
@@ -218,46 +130,18 @@ listarEnfermedades(Enfermedad) :-
         fail
     ).
 
-% Predicado para obtener la lista de enfermedades disponibles.
-%
-% Recibe:
-% - Lista de enfermedades disponibles.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Obtiene la lista de enfermedades disponibles para que el usuario elija una.
 listaEnfermedades(Enfermedades) :-
     findall(Enfermedad, enfermedad([Enfermedad|_], _), Enfermedades).
 
-% Predicado para obtener el nivel de entrenamiento del usuario.
-%
-% Recibe:
-% - Nivel de entrenamiento del usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Pregunta al usuario con qué frecuencia practica deporte para determinar su nivel.
+
+
+
 nivelUsuario(Nivel):-
     write("¿Con qué frecuencia practicas deporte?"), nl,
     read_string(user_input, '\n', '.', _,Q),
     sub_atom(Q,0,1,Después,Días),
     obtenerNivel(Nivel,Días).
 
-% Predicado para obtener el nivel de entrenamiento del usuario.
-%
-% Recibe:
-% - Nivel de entrenamiento del usuario.
-% - Días de entrenamiento por semana.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Asigna un nivel de entrenamiento según la frecuencia de entrenamiento del usuario.
 obtenerNivel(Nivel,Días):-
     nivel(Nivel,Cantidad),
     miembro(Días,Cantidad).
@@ -266,16 +150,8 @@ miembro(X,[X|_]).
 miembro(X,[_|Y]):-
     miembro(X,Y).
 
-% Predicado para listar los deportes disponibles.
-%
-% Recibe:
-% - Deporte seleccionado por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Lista los deportes disponibles para que el usuario elija uno.
+
+% Todos los posibles deportes del usuario
 deporte(['correr'|S],S).
 deporte(['ciclismo'|S],S).
 deporte(['natación'|S],S).
@@ -302,16 +178,7 @@ deporte(['rugby'|S],S).
 deporte(['golf'|S],S).
 deporte(['polo'|S],S).
 
-% Predicado para listar las enfermedades disponibles.
-%
-% Recibe:
-% - Enfermedad seleccionada por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Lista las enfermedades disponibles para que el usuario elija una.
+% Todas las posibles enfermedades del usuario
 enfermedad(['cardiopatia'|S],S).
 enfermedad(['problemas_de_articulaciones'|S],S).
 enfermedad(['problemas_de_columna'|S],S).
@@ -347,102 +214,32 @@ enfermedad(['hernia_discal'|S],S).
 enfermedad(['sindrome_del_tunel_carpiano'|S],S).
 enfermedad(['ninguna'|S],S).
 
-% Predicado para definir los niveles de entrenamiento del usuario.
-%
-% Recibe:
-% - Nivel de entrenamiento.
-% - Cantidad de días de entrenamiento por semana.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Define los niveles de entrenamiento del usuario según la frecuencia de entrenamiento.
+
+% Todos los posibles niveles de usuario
 nivel('principiante',['0','1','2']).
 nivel('intermedio',['3','4']).
 nivel('avanzado',['5','6','7']).
 
-% Predicado para identificar el saludo del usuario.
-%
-% Recibe:
-% - Saludo del usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Identifica si el usuario ha saludado al entrenador.
+% Todos los posibles saludos del usuario
 saludo(['hola'|S],S).
 saludo(['buenos'|S],S).
 saludo(['buenas'|S],S).
 
-% Predicado para identificar la hora del día mencionada por el usuario.
-%
-% Recibe:
-% - Hora del día mencionada por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Identifica si el usuario menciona "días", "tardes" o "noches".
+% Todas las posibles horas del día del usuario
 hora(['días'|S],S).
 hora(['tardes'|S],S).
 hora(['noches'|S],S).
 
-% Predicado para identificar el entrenador mencionado por el usuario.
-%
-% Recibe:
-% - Nombre del entrenador mencionado por el usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Identifica si el usuario menciona al entrenador de alguna forma.
+% Todos los posibles nombres del usuario
 entrenador(['Sr.Entrenador'|S],S).
 entrenador(['sr.entrenador'|S],S).
 entrenador(['srentrenador'|S],S).
 entrenador(['SrEntrenador'|S],S).
 
-% Predicado para identificar la respuesta afirmativa del usuario.
-%
-% Recibe:
-% - Respuesta afirmativa del usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Identifica si el usuario responde afirmativamente.
 si(['si'|S],S).
-
-% Predicado para identificar la respuesta negativa del usuario.
-%
-% Recibe:
-% - Respuesta negativa del usuario.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Identifica si el usuario responde negativamente.
 no(['no'|S],S).
 no(['ninguno'|S],S).
 
-% Predicado para crear un cliente y enviar un mensaje al servidor.
-%
-% Recibe:
-% - Host: Dirección del servidor.
-% - Port: Puerto del servidor.
-% - Message: Mensaje a enviar al servidor.
-% - Response: Respuesta del servidor.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Establece una conexión con el servidor y envía un mensaje para obtener una respuesta.
 create_client(Host, Port, Message, Response) :-
     setup_call_catcher_cleanup(tcp_socket(Socket),
                                tcp_connect(Socket, Host:Port),
@@ -452,19 +249,6 @@ create_client(Host, Port, Message, Response) :-
                        chat_to_server(In, Out, Message, Response),
                        close_connection(In, Out)).
 
-% Predicado para enviar un mensaje al servidor y recibir una respuesta.
-%
-% Recibe:
-% - Stream de entrada del socket.
-% - Stream de salida del socket.
-% - Mensaje a enviar al servidor.
-% - Respuesta del servidor.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Envía el mensaje al servidor y recibe la respuesta correspondiente.
 chat_to_server(In, Out, Message, Response) :-
     Term = Message,
     (   Term = end_of_file
@@ -478,17 +262,10 @@ chat_to_server(In, Out, Message, Response) :-
     ),
     !.
 
-% Predicado para cerrar la conexión con el servidor.
-%
-% Recibe:
-% - Stream de entrada del socket.
-% - Stream de salida del socket.
-%
-% Retorna:
-% - Nada.
-%
-% Función:
-% Cierra la conexión con el servidor.
+chat_to_server(_, _, _, _) :-
+    print_message(warning, 'chat failed'), !.
+
 close_connection(In, Out) :-
     close(In, [force(true)]),
-    close(Out, [force(true)]).
+    close(Out, [force(true)])
+    .
