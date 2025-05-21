@@ -2,7 +2,7 @@ import socket
 import openai
 import unicodedata
 
-openai.api_key = "sk-proj-WuoXT5lUp3mNnsckReEnT3BlbkFJx8sphbgdtHgKpH1C85a2"
+openai.api_key = "API_KEY"
 
 def remove_accents(input_str_):
     nfkd_form = unicodedata.normalize('NFKD', input_str_)
